@@ -8,6 +8,7 @@
 |------|------|------|
 | `build-windows.bat` | Windows | Windows x64编译脚本 |
 | `build-linux.sh` | Linux | Linux x64编译脚本 |
+| `build-linux-arm64.sh` | Linux | Linux ARM64编译脚本（交叉编译） |
 | `build-android.sh` | Linux | Android arm64-v8a编译脚本 |
 
 ## 🚀 快速开始
@@ -20,7 +21,7 @@ cd scripts
 .\build-windows.bat 6367
 ```
 
-### Linux
+### Linux x64
 
 ```bash
 # 给脚本添加执行权限
@@ -30,6 +31,19 @@ chmod +x scripts/build-linux.sh
 cd scripts
 ./build-linux.sh 6367
 ```
+
+### Linux ARM64
+
+```bash
+# 给脚本添加执行权限
+chmod +x scripts/build-linux-arm64.sh
+
+# 运行编译（交叉编译）
+cd scripts
+./build-linux-arm64.sh 6367
+```
+
+**注意**: Linux ARM64编译使用交叉编译，在x64 Linux系统上编译出ARM64版本。
 
 ### Android
 
@@ -63,7 +77,7 @@ cd scripts
    - ✅ Windows 10 SDK
    - ✅ MSVC v143构建工具
 
-### Linux
+### Linux x64
 
 - **操作系统**: Ubuntu 20.04/22.04 或等效系统
 - **编译器**: GCC 9+ 或 Clang 12+
@@ -81,6 +95,33 @@ sudo apt-get install -y build-essential python3 git curl
 
 # 脚本会自动安装其他依赖
 ```
+
+### Linux ARM64
+
+- **操作系统**: Ubuntu 20.04/22.04 或等效系统（x64，用于交叉编译）
+- **编译器**: GCC 9+ 和 gcc-aarch64-linux-gnu
+- **Python**: Python 3.8+
+- **磁盘空间**: 至少110GB可用空间
+- **内存**: 建议16GB+ RAM
+- **时间**: 5-8小时
+
+#### 交叉编译工具链安装
+
+```bash
+# 安装ARM64交叉编译工具链
+sudo apt-get update
+sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+# 脚本会自动安装其他依赖
+```
+
+**注意**: 这是交叉编译配置，在x64 Linux系统上编译出ARM64版本。如需在ARM64设备上本地编译，直接使用`build-linux.sh`。
+
+**适用设备**:
+- 树莓派 4/5 (运行Ubuntu ARM64)
+- AWS Graviton处理器
+- 华为鲲鹏处理器
+- Ampere Altra处理器
 
 ### Android
 

@@ -6,6 +6,7 @@
 
 - ✅ **Windows 10 x64**
 - ✅ **Linux x64**
+- ✅ **Linux ARM64** (适用于树莓派、ARM服务器等)
 - ✅ **Android arm64-v8a** (API 29及以上)
 
 ## 功能特性
@@ -54,7 +55,7 @@ check-requirements.bat
 build-windows.bat 6367
 ```
 
-**Linux:**
+**Linux x64:**
 ```bash
 # 1. 检查系统要求
 cd scripts
@@ -63,6 +64,17 @@ chmod +x *.sh
 
 # 2. 开始编译
 ./build-linux.sh 6367
+```
+
+**Linux ARM64:**
+```bash
+# 1. 检查系统要求
+cd scripts
+chmod +x *.sh
+./check-requirements.sh
+
+# 2. 开始编译（交叉编译）
+./build-linux-arm64.sh 6367
 ```
 
 **Android:**
@@ -95,11 +107,18 @@ chmod +x *.sh
 - 120GB+磁盘空间
 - 16GB+内存（推荐）
 
-**Linux:**
+**Linux x64:**
 - Ubuntu 20.04/22.04 或等效系统
 - GCC 9+ 或 Clang 12+
 - Python 3.8+
 - 100GB+磁盘空间
+- 16GB+内存（推荐）
+
+**Linux ARM64:**
+- Ubuntu 20.04/22.04 或等效系统（用于交叉编译）
+- gcc-aarch64-linux-gnu 交叉编译工具链
+- Python 3.8+
+- 110GB+磁盘空间
 - 16GB+内存（推荐）
 
 **Android:**
@@ -202,7 +221,8 @@ build_cef3/
 │   └── VERSION_MATRIX.md           # CEF版本对照表
 ├── scripts/
 │   ├── build-windows.bat           # Windows编译脚本
-│   ├── build-linux.sh              # Linux编译脚本
+│   ├── build-linux.sh              # Linux x64编译脚本
+│   ├── build-linux-arm64.sh        # Linux ARM64编译脚本
 │   ├── build-android.sh            # Android编译脚本
 │   ├── build-all.sh                # 全平台编译脚本
 │   ├── check-requirements.bat      # Windows系统检查
