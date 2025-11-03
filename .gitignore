@@ -1,0 +1,62 @@
+# CEF编译产物
+cef_build/
+chromium/
+binary_distrib/
+
+# 编译临时文件
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.tar.bz2
+*.tar.gz
+*.zip
+
+# 构建目录
+out/
+build/
+Debug/
+Release/
+
+# depot_tools
+depot_tools/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# 日志文件
+*.log
+build.log
+
+# IDE和编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 系统文件
+Thumbs.db
+desktop.ini
+
+# Android
+*.apk
+*.ap_
+*.dex
+local.properties
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+

@@ -1,0 +1,337 @@
+name: Build CEF Multi-Platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      cef_branch:
+        description: 'CEF分支版本（如6367表示CEF 131稳定版）'
+        required: true
+        default: '6367'
+      create_release:
+        description: '是否创建GitHub Release'
+        required: true
+        type: boolean
+        default: true
+  schedule:
+    # 每月1号UTC时间0点执行
+    - cron: '0 0 1 * *'
+
+env:
+  CEF_BRANCH: ${{ github.event.inputs.cef_branch || '6367' }}
+  
+jobs:
+  build-windows:
+    name: Build Windows x64
+    runs-on: windows-2022
+    timeout-minutes: 480  # 8小时
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Python环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 安装构建依赖
+        shell: powershell
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          choco install ninja -y
+          
+      - name: 设置Visual Studio环境
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: '17.0'
+      
+      - name: 下载automate-git.py
+        shell: bash
+        run: |
+          mkdir -p cef_build
+          cd cef_build
+          curl -O https://bitbucket.org/chromiumembedded/cef/raw/master/tools/automate/automate-git.py
+          
+      - name: 编译CEF Windows x64
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cd cef_build
+          python automate-git.py ^
+            --download-dir=D:\cef_download ^
+            --depot-tools-dir=D:\depot_tools ^
+            --branch=%CEF_BRANCH% ^
+            --x64-build ^
+            --with-proprietary-codecs ^
+            --no-debug-build ^
+            --minimal-distrib ^
+            --force-build ^
+            --build-target=cefsimple
+        env:
+          GYP_MSVS_VERSION: 2022
+          CEF_ARCHIVE_FORMAT: tar.bz2
+          GN_DEFINES: proprietary_codecs=true ffmpeg_branding="Chrome" is_official_build=true
+          
+      - name: 查找编译产物
+        id: find_artifact
+        shell: bash
+        run: |
+          cd cef_build/chromium/src/cef/binary_distrib
+          ARTIFACT=$(ls -t cef_binary_*_windows64_minimal.tar.bz2 | head -1)
+          echo "artifact_name=$ARTIFACT" >> $GITHUB_OUTPUT
+          echo "artifact_path=cef_build/chromium/src/cef/binary_distrib/$ARTIFACT" >> $GITHUB_OUTPUT
+          
+      - name: 上传编译产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: cef-windows-x64
+          path: ${{ steps.find_artifact.outputs.artifact_path }}
+          retention-days: 7
+          
+  build-linux:
+    name: Build Linux x64
+    runs-on: ubuntu-22.04
+    timeout-minutes: 480  # 8小时
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Python环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 安装构建依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libglib2.0-dev \
+            libgtk-3-dev \
+            libpango1.0-dev \
+            libatk1.0-dev \
+            libcairo2-dev \
+            libx11-dev \
+            libxcomposite-dev \
+            libxdamage-dev \
+            libxext-dev \
+            libxfixes-dev \
+            libxrandr-dev \
+            libgbm-dev \
+            libdrm-dev \
+            libxkbcommon-dev \
+            libnss3-dev \
+            libcups2-dev \
+            libxss-dev \
+            libasound2-dev \
+            libpci-dev \
+            libpulse-dev \
+            libudev-dev \
+            ninja-build \
+            cmake
+          
+      - name: 下载automate-git.py
+        run: |
+          mkdir -p cef_build
+          cd cef_build
+          curl -O https://bitbucket.org/chromiumembedded/cef/raw/master/tools/automate/automate-git.py
+          
+      - name: 编译CEF Linux x64
+        run: |
+          cd cef_build
+          python automate-git.py \
+            --download-dir=$HOME/cef_download \
+            --depot-tools-dir=$HOME/depot_tools \
+            --branch=$CEF_BRANCH \
+            --x64-build \
+            --with-proprietary-codecs \
+            --no-debug-build \
+            --minimal-distrib \
+            --force-build \
+            --build-target=cefsimple
+        env:
+          CEF_ARCHIVE_FORMAT: tar.bz2
+          GN_DEFINES: proprietary_codecs=true ffmpeg_branding="Chrome" is_official_build=true
+          
+      - name: 查找编译产物
+        id: find_artifact
+        run: |
+          cd cef_build/chromium/src/cef/binary_distrib
+          ARTIFACT=$(ls -t cef_binary_*_linux64_minimal.tar.bz2 | head -1)
+          echo "artifact_name=$ARTIFACT" >> $GITHUB_OUTPUT
+          echo "artifact_path=cef_build/chromium/src/cef/binary_distrib/$ARTIFACT" >> $GITHUB_OUTPUT
+          
+      - name: 上传编译产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: cef-linux-x64
+          path: ${{ steps.find_artifact.outputs.artifact_path }}
+          retention-days: 7
+          
+  build-android:
+    name: Build Android arm64-v8a
+    runs-on: ubuntu-22.04
+    timeout-minutes: 480  # 8小时
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Python环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 设置Java环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: 安装构建依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ninja-build \
+            cmake \
+            pkg-config
+          
+      - name: 设置Android SDK和NDK
+        run: |
+          # 下载Android SDK命令行工具
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip
+          mv cmdline-tools latest
+          
+          # 设置环境变量
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+          
+          # 接受许可并安装必要组件
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-29" "build-tools;34.0.0" "ndk;25.2.9519653"
+          
+          # 创建环境变量文件
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+          
+      - name: 下载automate-git.py
+        run: |
+          mkdir -p cef_build
+          cd cef_build
+          curl -O https://bitbucket.org/chromiumembedded/cef/raw/master/tools/automate/automate-git.py
+          
+      - name: 编译CEF Android arm64-v8a
+        run: |
+          cd cef_build
+          python automate-git.py \
+            --download-dir=$HOME/cef_download \
+            --depot-tools-dir=$HOME/depot_tools \
+            --branch=$CEF_BRANCH \
+            --arm64-build \
+            --with-proprietary-codecs \
+            --no-debug-build \
+            --minimal-distrib \
+            --force-build
+        env:
+          CEF_ARCHIVE_FORMAT: tar.bz2
+          GN_DEFINES: proprietary_codecs=true ffmpeg_branding="Chrome" is_official_build=true target_os="android" target_cpu="arm64" android_sdk_root="$ANDROID_SDK_ROOT" android_ndk_root="$ANDROID_NDK_ROOT" android_ndk_version="r25c"
+          
+      - name: 查找编译产物
+        id: find_artifact
+        run: |
+          cd cef_build/chromium/src/cef/binary_distrib
+          ARTIFACT=$(ls -t cef_binary_*_androidarm64_minimal.tar.bz2 2>/dev/null | head -1 || ls -t cef_binary_*_linuxarm64_minimal.tar.bz2 | head -1)
+          echo "artifact_name=$ARTIFACT" >> $GITHUB_OUTPUT
+          echo "artifact_path=cef_build/chromium/src/cef/binary_distrib/$ARTIFACT" >> $GITHUB_OUTPUT
+          
+      - name: 上传编译产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: cef-android-arm64
+          path: ${{ steps.find_artifact.outputs.artifact_path }}
+          retention-days: 7
+          
+  create-release:
+    name: Create GitHub Release
+    needs: [build-windows, build-linux, build-android]
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.create_release != 'false' }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 下载所有编译产物
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: 准备Release文件
+        id: prepare
+        run: |
+          mkdir -p release_files
+          
+          # 移动和重命名文件
+          if [ -d "artifacts/cef-windows-x64" ]; then
+            cp artifacts/cef-windows-x64/*.tar.bz2 release_files/ || true
+          fi
+          
+          if [ -d "artifacts/cef-linux-x64" ]; then
+            cp artifacts/cef-linux-x64/*.tar.bz2 release_files/ || true
+          fi
+          
+          if [ -d "artifacts/cef-android-arm64" ]; then
+            cp artifacts/cef-android-arm64/*.tar.bz2 release_files/ || true
+          fi
+          
+          # 列出文件
+          ls -lh release_files/
+          
+          # 生成release标签
+          RELEASE_TAG="cef-build-${{ env.CEF_BRANCH }}-$(date +%Y%m%d-%H%M%S)"
+          echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+          
+          # 生成发布说明
+          cat > release_notes.md << EOF
+          # CEF多平台编译构建
+          
+          **CEF分支版本**: ${{ env.CEF_BRANCH }}
+          **构建日期**: $(date '+%Y-%m-%d %H:%M:%S UTC')
+          **提交SHA**: ${{ github.sha }}
+          
+          ## 编译配置
+          
+          - ✅ Windows 10 x64
+          - ✅ Linux x64  
+          - ✅ Android arm64-v8a (API 29+)
+          - ✅ 启用H264/H265解码器支持 (proprietary_codecs=true)
+          - ✅ 最小化分发包（仅库文件）
+          
+          ## 下载说明
+          
+          下载对应平台的 \`.tar.bz2\` 文件并解压使用。
+          
+          ## 许可证注意事项
+          
+          此构建启用了专有编解码器支持，使用时请确保遵守相关许可证要求。
+          EOF
+          
+      - name: 创建GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.prepare.outputs.release_tag }}
+          name: CEF Build ${{ env.CEF_BRANCH }} - ${{ github.run_number }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+          files: release_files/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

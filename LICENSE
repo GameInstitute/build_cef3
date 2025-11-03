@@ -1,0 +1,43 @@
+MIT License
+
+Copyright (c) 2025 CEF Build Scripts Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+IMPORTANT NOTICES:
+
+1. This repository contains build scripts for Chromium Embedded Framework (CEF).
+   CEF itself is licensed under BSD license. See: https://bitbucket.org/chromiumembedded/cef/src/master/LICENSE.txt
+
+2. The compiled binaries produced by these scripts may include proprietary codecs
+   (H.264, H.265, AAC, etc.) which are subject to patent licensing requirements.
+   
+   Commercial use of these codecs may require obtaining appropriate licenses from:
+   - MPEG LA (for H.264/AVC): https://www.mpegla.com/
+   - HEVC Advance (for H.265/HEVC): https://www.hevcadvance.com/
+   - Via Licensing (for AAC): https://www.via-corp.com/
+
+3. Users are responsible for ensuring compliance with all applicable licenses
+   and patent requirements for their specific use case.
+
+4. This license (MIT) applies only to the build scripts and documentation in
+   this repository, not to CEF, Chromium, or the compiled binaries.
+
