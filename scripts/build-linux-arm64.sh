@@ -231,7 +231,6 @@ $PYTHON_CMD automate-git.py \
     --depot-tools-dir="$DEPOT_TOOLS_DIR" \
     --branch=$CEF_BRANCH \
     --arm64-build \
-    --with-proprietary-codecs \
     --no-debug-build \
     --minimal-distrib \
     --force-build \

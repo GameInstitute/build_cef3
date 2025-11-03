@@ -126,16 +126,15 @@ echo - 调试版本: 禁用
 echo - 最小化分发: 启用
 echo.
 
-python automate-git.py ^
-    --download-dir="%DOWNLOAD_DIR%" ^
-    --depot-tools-dir="%DEPOT_TOOLS_DIR%" ^
-    --branch=%CEF_BRANCH% ^
-    --x64-build ^
-    --with-proprietary-codecs ^
-    --no-debug-build ^
-    --minimal-distrib ^
-    --force-build ^
-    --build-target=cefsimple
+          python automate-git.py ^
+            --download-dir="%DOWNLOAD_DIR%" ^
+            --depot-tools-dir="%DEPOT_TOOLS_DIR%" ^
+            --branch=%CEF_BRANCH% ^
+            --x64-build ^
+            --no-debug-build ^
+            --minimal-distrib ^
+            --force-build ^
+            --build-target=cefsimple
 
 if %ERRORLEVEL% NEQ 0 (
     echo 错误: 编译失败，请检查日志

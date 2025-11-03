@@ -228,15 +228,14 @@ echo ""
 echo "注意: Android编译通常比桌面平台耗时更长，请耐心等待..."
 echo ""
 
-$PYTHON_CMD automate-git.py \
-    --download-dir="$DOWNLOAD_DIR" \
-    --depot-tools-dir="$DEPOT_TOOLS_DIR" \
-    --branch=$CEF_BRANCH \
-    --arm64-build \
-    --with-proprietary-codecs \
-    --no-debug-build \
-    --minimal-distrib \
-    --force-build
+          $PYTHON_CMD automate-git.py \
+            --download-dir="$DOWNLOAD_DIR" \
+            --depot-tools-dir="$DEPOT_TOOLS_DIR" \
+            --branch=$CEF_BRANCH \
+            --arm64-build \
+            --no-debug-build \
+            --minimal-distrib \
+            --force-build
 
 if [ $? -ne 0 ]; then
     echo "错误: 编译失败，请检查日志"

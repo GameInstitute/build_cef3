@@ -169,10 +169,12 @@ is_official_build=true
 
 ### 编译选项
 
-- `--with-proprietary-codecs`: 启用专有编解码器
+- `--x64-build` / `--arm64-build`: 指定目标架构
 - `--minimal-distrib`: 最小化分发包（仅库文件）
 - `--no-debug-build`: 仅编译Release版本
 - `--force-build`: 强制重新编译
+
+**注意**: 专有编解码器通过环境变量 `GN_DEFINES` 启用，而不是命令行选项
 
 ## 构建时间
 

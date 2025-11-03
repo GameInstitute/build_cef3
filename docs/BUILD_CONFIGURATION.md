@@ -71,7 +71,12 @@ is_debug=false
 - `--no-debug-build`: 不构建调试版本
 - `--minimal-distrib`: 生成最小化分发包（仅库文件）
 - `--force-build`: 强制重新构建
-- `--with-proprietary-codecs`: 启用专有编解码器
+
+**注意**: `--with-proprietary-codecs` 不是有效选项。专有编解码器通过环境变量 `GN_DEFINES` 启用：
+
+```bash
+export GN_DEFINES="proprietary_codecs=true ffmpeg_branding=\"Chrome\""
+```
 
 ### 平台特定参数
 

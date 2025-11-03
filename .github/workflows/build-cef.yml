@@ -62,7 +62,6 @@ jobs:
             --depot-tools-dir=D:\depot_tools ^
             --branch=%CEF_BRANCH% ^
             --x64-build ^
-            --with-proprietary-codecs ^
             --no-debug-build ^
             --minimal-distrib ^
             --force-build ^
@@ -145,7 +144,6 @@ jobs:
             --depot-tools-dir=$HOME/depot_tools \
             --branch=$CEF_BRANCH \
             --x64-build \
-            --with-proprietary-codecs \
             --no-debug-build \
             --minimal-distrib \
             --force-build \
@@ -228,7 +226,6 @@ jobs:
             --depot-tools-dir=$HOME/depot_tools \
             --branch=$CEF_BRANCH \
             --arm64-build \
-            --with-proprietary-codecs \
             --no-debug-build \
             --minimal-distrib \
             --force-build \
@@ -318,7 +315,6 @@ jobs:
             --depot-tools-dir=$HOME/depot_tools \
             --branch=$CEF_BRANCH \
             --arm64-build \
-            --with-proprietary-codecs \
             --no-debug-build \
             --minimal-distrib \
             --force-build
